@@ -4,7 +4,8 @@
 //	YOUCAM_API_KEY=...  go run ./cmd/server
 //
 // Flags/env: -addr (:8080), -data (./data-local), -catalog (./data/catalog.json),
-// -check-gap (168h in prod; use e.g. 2m for demos), -dev (proxy / to Vite on :5173).
+// -check-gap (168h in prod; use e.g. 2m for demos), -dev (proxy / to Vite on :5173),
+// -scans-per-hour (60). ADMIN_TOKEN enables /api/admin/* (Bearer auth); unset, they 404.
 package main
 
 import (
@@ -18,6 +19,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -43,6 +45,7 @@ func main() {
 	dbPath := flag.String("db", env("DB_PATH", ""), "sqlite file (default <data>/skinverdict.db); 'json' uses the JSON store")
 	agentMode := flag.String("agent", env("AGENT", "claude"), "claude (Claude Code CLI, falls back to rules) | rules")
 	claudeBin := flag.String("claude-bin", env("CLAUDE_BIN", "claude"), "path to the claude CLI")
+	scansPerHour := flag.Int("scans-per-hour", mustInt(env("SCANS_PER_HOUR", "60")), "server-wide cap on YouCam scans (9 units each); 0 = unlimited")
 	flag.Parse()
 
 	key := os.Getenv("YOUCAM_API_KEY")
@@ -83,7 +86,7 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	(&api.Server{App: a}).Routes(mux)
+	(&api.Server{App: a, AdminToken: os.Getenv("ADMIN_TOKEN"), ScansPerHour: *scansPerHour}).Routes(mux)
 	if *dev != "" {
 		u, _ := url.Parse(*dev)
 		mux.Handle("/", httputil.NewSingleHostReverseProxy(u))
@@ -147,6 +150,14 @@ func env(k, def string) string {
 		return v
 	}
 	return def
+}
+
+func mustInt(s string) int {
+	n, err := strconv.Atoi(s)
+	if err != nil {
+		log.Fatalf("bad integer %q", s)
+	}
+	return n
 }
 
 func mustDur(s string) time.Duration {

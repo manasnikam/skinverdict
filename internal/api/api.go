@@ -2,6 +2,7 @@
 package api
 
 import (
+	"crypto/subtle"
 	"encoding/json"
 	"errors"
 	"io"
@@ -10,6 +11,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/manasnikam/skinverdict/internal/app"
@@ -17,7 +19,13 @@ import (
 )
 
 type Server struct {
-	App *app.App
+	App          *app.App
+	AdminToken   string // required as "Authorization: Bearer <token>" on /api/admin/*; "" disables those routes
+	ScansPerHour int    // server-wide cap on YouCam analyses (9 units each); 0 = unlimited
+
+	mu          sync.Mutex
+	windowStart time.Time
+	scansInWin  int
 }
 
 func (s *Server) Routes(mux *http.ServeMux) {
@@ -33,13 +41,55 @@ func (s *Server) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /api/trials/{id}", s.trial)
 	mux.HandleFunc("POST /api/trials/{id}/scans", s.scan)
 	mux.HandleFunc("POST /api/trials/{id}/checkin", s.checkin)
-	mux.HandleFunc("POST /api/admin/checkin-all", s.checkinAll) // demo helper: run check-ins on every active trial with ≥2 scans
+	mux.HandleFunc("POST /api/admin/checkin-all", s.admin(s.checkinAll)) // demo helper: run check-ins on every active trial with ≥2 scans
 
 	mux.HandleFunc("GET /api/brand/cohorts", s.cohorts)                  // ?by=profile for product × skin-profile rows
 	mux.HandleFunc("GET /api/products/{id}/outcomes", s.productOutcomes) // ?profile=oily → "people like you"
 
 	// scan images + masks only: DataDir also holds the database and the YouCam cache
-	mux.Handle("GET /files/scans/", http.StripPrefix("/files/", http.FileServer(http.Dir(s.App.DataDir))))
+	files := http.StripPrefix("/files/", http.FileServer(http.Dir(s.App.DataDir)))
+	mux.HandleFunc("GET /files/scans/", func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasSuffix(r.URL.Path, "/") { // no directory listings: they would enumerate every selfie
+			http.NotFound(w, r)
+			return
+		}
+		files.ServeHTTP(w, r)
+	})
+}
+
+// admin guards a handler with the bearer AdminToken; routes 404 when no token is configured.
+func (s *Server) admin(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if s.AdminToken == "" {
+			http.NotFound(w, r)
+			return
+		}
+		got := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
+		if subtle.ConstantTimeCompare([]byte(got), []byte(s.AdminToken)) != 1 {
+			writeJSON(w, 401, map[string]string{"error": "unauthorized"})
+			return
+		}
+		h(w, r)
+	}
+}
+
+// takeScan spends one slot of the hourly scan budget.
+// ponytail: one server-wide fixed window, not per-IP (behind Cloud Run/Caddy RemoteAddr is the proxy);
+// fine at max-instances 1, move to per-user limits once there are accounts.
+func (s *Server) takeScan() bool {
+	if s.ScansPerHour <= 0 {
+		return true
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if time.Since(s.windowStart) >= time.Hour {
+		s.windowStart, s.scansInWin = time.Now(), 0
+	}
+	if s.scansInWin >= s.ScansPerHour {
+		return false
+	}
+	s.scansInWin++
+	return true
 }
 
 // ---------- helpers ----------
@@ -52,8 +102,11 @@ func writeJSON(w http.ResponseWriter, code int, v any) {
 
 func writeErr(w http.ResponseWriter, err error) {
 	code := http.StatusInternalServerError
+	var tooBig *http.MaxBytesError
 	if errors.Is(err, store.ErrNotFound) {
 		code = http.StatusNotFound
+	} else if errors.As(err, &tooBig) {
+		code = http.StatusRequestEntityTooLarge
 	}
 	log.Printf("api error: %v", err)
 	writeJSON(w, code, map[string]string{"error": err.Error()})
@@ -119,11 +172,14 @@ func (s *Server) personas(w http.ResponseWriter, _ *http.Request) {
 }
 
 func (s *Server) createPersona(w http.ResponseWriter, r *http.Request) {
-	var p store.Persona
-	if err := readJSON(r, &p); err != nil {
+	var in store.Persona
+	if err := readJSON(r, &in); err != nil {
 		writeErr(w, err)
 		return
 	}
+	// create only: a client-chosen id would overwrite someone else's persona, and
+	// profile is set from the first scan, never by the client
+	p := store.Persona{Name: in.Name}
 	if err := s.App.Store.UpsertPersona(&p); err != nil {
 		writeErr(w, err)
 		return
@@ -176,6 +232,7 @@ func (s *Server) trial(w http.ResponseWriter, r *http.Request) {
 func (s *Server) scan(w http.ResponseWriter, r *http.Request) {
 	var img []byte
 	var atStr, adherence string
+	r.Body = http.MaxBytesReader(w, r.Body, 13<<20) // 12 MB image + multipart overhead
 	ct := r.Header.Get("Content-Type")
 	if strings.HasPrefix(ct, "multipart/form-data") {
 		if err := r.ParseMultipartForm(12 << 20); err != nil {
@@ -192,7 +249,11 @@ func (s *Server) scan(w http.ResponseWriter, r *http.Request) {
 		atStr = r.FormValue("at")
 		adherence = r.FormValue("adherence")
 	} else {
-		img, _ = io.ReadAll(io.LimitReader(r.Body, 12<<20))
+		var err error
+		if img, err = io.ReadAll(r.Body); err != nil {
+			writeErr(w, err)
+			return
+		}
 		atStr = r.URL.Query().Get("at")
 		adherence = r.URL.Query().Get("adherence")
 	}
@@ -214,6 +275,10 @@ func (s *Server) scan(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		at = t
+	}
+	if !s.takeScan() {
+		writeJSON(w, 429, map[string]string{"error": "scan limit reached, try again later"})
+		return
 	}
 	sc, err := s.App.Scan(r.Context(), r.PathValue("id"), img, at, adherence)
 	if err != nil {
