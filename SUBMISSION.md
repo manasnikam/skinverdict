@@ -97,3 +97,18 @@ go, preact, vite, sqlite, youcam-api, youcam-camera-kit, claude-code
 - Live demo: https://skinverdict-gwjm7k5b2a-uc.a.run.app
 - Code: https://github.com/manasnikam/skinverdict
 - Demo video: <add YouTube/Vimeo link>
+
+## Gallery
+Images are exported from the demo video at 1500×1000 (3:2) into `video/out/gallery/` (gitignored; regenerate from `video/out/final.mp4`). Use image 1 as the cover. YouTube thumbnail: `video/out/youtube-thumbnail.jpg` (1280×720).
+
+| # | File | Caption |
+|---|---|---|
+| 1 | `01-proof-guarantee.jpg` | Not working after 28 days: the Proof Guarantee settles itself as ₹699 store credit and suggests a swap. |
+| 2 | `02-pick-a-product.jpg` | Pick a product and see how it worked for people with your skin type. |
+| 3 | `03-youcam-pore-mask.jpg` | YouCam AI Skin Analysis scores each concern and maps where it shows up. |
+| 4 | `04-working-reorder.jpg` | Working: pores up 9.8 points in 28 days, outside the ±4 noise band, so the agent reorders. |
+| 5 | `05-raw-vs-app-score.jpg` | We judge YouCam's raw score and also show the friendlier app score. |
+| 6 | `06-one-bad-scan.jpg` | Same face, one bad scan: why a single score can't decide a refund. |
+| 7 | `07-how-we-judged.jpg` | First to latest said +2.2, the robust trend said +0.1; we count only what both agree on. |
+| 8 | `08-brand-dashboard.jpg` | Brand view: Niacinamide fails for dry skin 2 of 2, and what it cost in credits. |
+| 9 | `09-under-the-hood.jpg` | Real code: the Theil–Sen trend that keeps one outlier scan from deciding a refund. |
