@@ -4,7 +4,9 @@
 
 Built on the **YouCam AI Skin Analysis API** (Perfect Corp) for the YouCam API Skin AI & eCommerce VTO Hackathon.
 
-**Demo video (2:32):** https://youtu.be/RpIzEpALbzY
+[![SkinVerdict demo video (2:32)](docs/video-thumbnail.jpg)](https://youtu.be/RpIzEpALbzY)
+
+▶ **[Watch the 2:32 demo on YouTube](https://youtu.be/RpIzEpALbzY)**
 
 **Live demo:** https://skinverdict-gwjm7k5b2a-uc.a.run.app (resets to the demo data on each cold start; the AI-face trial is `#/trial/c8146f44226c96c9`)
 
