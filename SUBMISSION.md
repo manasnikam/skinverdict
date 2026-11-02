@@ -1,7 +1,10 @@
 # Devpost submission — SkinVerdict
 
-## Tagline
-Is your skincare actually working? A scan-verified verdict — and an agent that reorders, swaps, or refunds based on it.
+## Project name
+SkinVerdict
+
+## Elevator pitch (192 characters)
+Is your skincare actually working? SkinVerdict re-scans your skin with YouCam AI, gives a fair verdict on the one thing a product claims to fix, and reorders, swaps or refunds as store credit.
 
 ## Inspiration
 The hackathon brief names the moment exactly: *standing in front of a mirror deciding whether a product is working*. Every brand says it works; nobody measures it. Subscriptions churn on vibes, reviews are vibes, and even YouCam's consumer-facing `ui_score` is documented as "adjusted to produce more favorable results". We built the thing that tracks the number underneath.
