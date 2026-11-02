@@ -14,7 +14,7 @@ function Outcomes({ productId, profile, cat }: { productId: string; profile?: st
   const side = Object.entries(row.worsened ?? {}).map(([k, n]) => `${cat.concern_labels[k] ?? k} ×${n}`).join(", ");
   return (
     <span class="small">
-      {o?.matching ? <b>{row.judged} {profile} shoppers</b> : <b>{row.judged} shoppers</b>}: {w} working, {nw} not · mean {row.mean_delta >= 0 ? "+" : ""}{row.mean_delta} on {cat.concern_labels[row.target] ?? row.target}
+      <b>{row.judged} {o?.matching ? `${profile} ` : ""}{row.judged === 1 ? "shopper" : "shoppers"}</b>: {w} working, {nw} not · mean {row.mean_delta >= 0 ? "+" : ""}{row.mean_delta} on {cat.concern_labels[row.target] ?? row.target}
       {side && <span class="muted"> · flagged {side}</span>}
       {row.credits_issued > 0 && <span class="muted"> · {row.credits_issued} guarantee credit{row.credits_issued > 1 ? "s" : ""}</span>}
     </span>
@@ -159,11 +159,11 @@ function TrialPage({ id, cat }: { id: string; cat: Catalog }) {
     <>
       <section class="card">
         <h2>{product.name} <span class="muted">· {product.brand}</span></h2>
-        <p class="muted">Judged on <b>{label(trial.target)}</b>; also watching {trial.concerns.filter((c) => c !== trial.target).map(label).join(", ")}.</p>
+        <p class="muted">Judged on <b>{label(trial.target)}</b>; also watching {trial.concerns.filter((c) => c !== trial.target && cat.concern_labels[c]).map(label).join(", ")}.</p>
         <div class={"verdict v-" + verdict.status}>
           <div class="big">{STATUS_LABEL[verdict.status]}</div>
-          <div>{label(verdict.target)}: {verdict.baseline?.toFixed(1)} → {verdict.latest?.toFixed(1)}
-            {" "}<b>({verdict.delta >= 0 ? "+" : ""}{verdict.delta?.toFixed(1)})</b> over {verdict.days} days · {verdict.scans} scans · confidence {verdict.confidence}</div>
+          {verdict.scans > 0 && <div>{label(verdict.target)}: {verdict.baseline?.toFixed(1)} → {verdict.latest?.toFixed(1)}
+            {" "}<b>({verdict.delta >= 0 ? "+" : ""}{verdict.delta?.toFixed(1)})</b> over {verdict.days} days · {verdict.scans} scans · confidence {verdict.confidence}</div>}
           <p class="small">{verdict.explanation}</p>
         </div>
         {trial.last_action && (

@@ -6,3 +6,4 @@ web/dist/assets/
 .env
 .scaffold.tgz
 .omc/
+.playwright-mcp/

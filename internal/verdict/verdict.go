@@ -32,6 +32,7 @@ type Options struct {
 	MinDays      int     // before this, only a very large gain counts as Working
 	HorizonDays  int     // by this point, "no movement" becomes NotWorking
 	EarlyWinMult float64 // gain needed before MinDays, as a multiple of NoiseBand
+	Label        func(concern string) string // display name in Explanation; nil shows the raw concern id
 }
 
 func DefaultOptions() Options {
@@ -118,12 +119,16 @@ func Evaluate(target string, scans []Scan, opt Options) (Verdict, error) {
 }
 
 func explain(v Verdict, opt Options) string {
+	label := opt.Label
+	if label == nil {
+		label = func(c string) string { return c }
+	}
 	dir := "improved"
 	if v.Delta < 0 {
 		dir = "worsened"
 	}
 	s := fmt.Sprintf("%s %s by %.1f raw points over %d days across %d scans (noise band ±%.0f).",
-		v.Target, dir, math.Abs(v.Delta), v.Days, v.Scans, opt.NoiseBand)
+		label(v.Target), dir, math.Abs(v.Delta), v.Days, v.Scans, opt.NoiseBand)
 	switch v.Status {
 	case Working:
 		s += " That is outside the noise band, so the product is doing something."
@@ -142,8 +147,13 @@ func explain(v Verdict, opt Options) string {
 	}
 	if len(v.Worsened) > 0 {
 		s += " Side effects flagged:"
-		for k, d := range v.Worsened {
-			s += fmt.Sprintf(" %s %.1f;", k, d)
+		keys := make([]string, 0, len(v.Worsened))
+		for k := range v.Worsened {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys) // stable text across check-ins
+		for _, k := range keys {
+			s += fmt.Sprintf(" %s %.1f;", label(k), v.Worsened[k])
 		}
 	}
 	return s

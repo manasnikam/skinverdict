@@ -75,9 +75,11 @@ func main() {
 	}
 	log.Printf("agent: %s", *agentMode)
 
+	opts := verdict.DefaultOptions()
+	opts.Label = cat.Label
 	a := &app.App{
 		Store: st, Catalog: cat, YouCam: yc, Agent: ag,
-		DataDir: *dataDir, Options: verdict.DefaultOptions(), CheckGap: *gap,
+		DataDir: *dataDir, Options: opts, CheckGap: *gap,
 	}
 
 	mux := http.NewServeMux()

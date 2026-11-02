@@ -10,7 +10,7 @@
     <div id="app"></div>
     <!-- YouCam JS Camera Kit: in-browser face/lighting/pose quality gate -->
     <script>
-      window.YMKAsyncInit = function () { window.__ymkReady = true; document.dispatchEvent(new Event("ymk-ready")); };
+      window.ymkAsyncInit = function () { window.__ymkReady = true; document.dispatchEvent(new Event("ymk-ready")); };
     </script>
     <script src="https://plugins-media.makeupar.com/v2.5-camera-kit/sdk.js" async></script>
     <script type="module" src="/src/main.tsx"></script>

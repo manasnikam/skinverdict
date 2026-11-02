@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -67,8 +68,12 @@ func (s *Server) fileURL(p string) string {
 	if p == "" {
 		return ""
 	}
-	rel := strings.TrimPrefix(strings.TrimPrefix(p, s.App.DataDir), "/")
-	return "/files/" + rel
+	// Rel cleans both sides, so "./data-local" matches stored "data-local/..." paths
+	rel, err := filepath.Rel(s.App.DataDir, p)
+	if err != nil || strings.HasPrefix(rel, "..") {
+		return ""
+	}
+	return "/files/" + filepath.ToSlash(rel)
 }
 
 type scanView struct {
