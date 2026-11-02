@@ -1,0 +1,8 @@
+bin/
+data-local/
+.youcam-cache/
+web/node_modules/
+web/dist/assets/
+.env
+.scaffold.tgz
+.omc/

@@ -1,0 +1,20 @@
+[Unit]
+Description=SkinVerdict
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=skinverdict
+Group=skinverdict
+WorkingDirectory=/opt/skinverdict
+EnvironmentFile=/opt/skinverdict/.env
+ExecStart=/opt/skinverdict/skinverdict -addr 127.0.0.1:8080 -data /opt/skinverdict/data -catalog /opt/skinverdict/catalog.json
+Restart=always
+RestartSec=2
+# claude CLI needs HOME for its login state; keep the service user's home
+Environment=HOME=/home/skinverdict
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

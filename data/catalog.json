@@ -1,0 +1,16 @@
+{
+  "products": [
+    {"id": "nia10", "name": "Niacinamide 10% Serum", "brand": "Clearline", "price_inr": 699, "claim": "Minimises pores and controls oil", "target": "pore", "guards": ["oiliness", "redness"], "alternatives": ["azel10", "bha2"]},
+    {"id": "bha2", "name": "Salicylic Acid 2% Exfoliant", "brand": "Clearline", "price_inr": 749, "claim": "Clears breakouts and unclogs pores", "target": "acne", "guards": ["redness", "moisture"], "alternatives": ["azel10", "nia10"]},
+    {"id": "vitc15", "name": "Vitamin C 15% Brightening Serum", "brand": "Lumen Labs", "price_inr": 1199, "claim": "Fades dark spots and boosts radiance", "target": "age_spot", "guards": ["redness", "radiance"], "alternatives": ["azel10", "retin03"]},
+    {"id": "azel10", "name": "Azelaic Acid 10% Cream", "brand": "Lumen Labs", "price_inr": 899, "claim": "Calms redness and evens tone", "target": "redness", "guards": ["moisture", "acne"], "alternatives": ["cera", "nia10"]},
+    {"id": "retin03", "name": "Retinol 0.3% Night Serum", "brand": "Nocturne", "price_inr": 1499, "claim": "Smooths texture and fine lines", "target": "texture", "guards": ["redness", "moisture"], "alternatives": ["vitc15", "pep"]},
+    {"id": "cera", "name": "Ceramide Barrier Moisturiser", "brand": "Nocturne", "price_inr": 649, "claim": "Restores hydration and barrier", "target": "moisture", "guards": ["oiliness", "acne"], "alternatives": ["hya2", "azel10"]},
+    {"id": "hya2", "name": "Hyaluronic Acid 2% + B5", "brand": "Dew", "price_inr": 599, "claim": "Deep hydration, plumper skin", "target": "moisture", "guards": ["oiliness"], "alternatives": ["cera"]},
+    {"id": "pep", "name": "Peptide Firming Serum", "brand": "Dew", "price_inr": 1299, "claim": "Firms and lifts", "target": "firmness", "guards": ["redness", "texture"], "alternatives": ["retin03"]}
+  ],
+  "concern_labels": {
+    "pore": "Pores", "acne": "Breakouts", "age_spot": "Dark spots", "redness": "Redness", "texture": "Texture",
+    "moisture": "Hydration", "oiliness": "Oil control", "radiance": "Radiance", "firmness": "Firmness", "wrinkle": "Fine lines"
+  }
+}
