@@ -94,5 +94,6 @@ go, preact, vite, sqlite, youcam-api, youcam-camera-kit, claude-code
 - Live scans in the app are real YouCam calls.
 
 ## Links
+- Live demo: https://skinverdict-gwjm7k5b2a-uc.a.run.app
 - Code: https://github.com/manasnikam/skinverdict
 - Demo video: <add YouTube/Vimeo link>

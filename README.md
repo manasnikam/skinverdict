@@ -4,6 +4,8 @@
 
 Built on the **YouCam AI Skin Analysis API** (Perfect Corp) for the YouCam API Skin AI & eCommerce VTO Hackathon.
 
+**Live demo:** https://skinverdict-gwjm7k5b2a-uc.a.run.app (resets to the demo data on each cold start; the AI-face trial is `#/trial/c8146f44226c96c9`)
+
 <p>
   <img src="docs/home.png" width="260" alt="Pick a product, see outcomes for people with your skin type">
   <img src="docs/trial.png" width="260" alt="Trial verdict, agent action, score chart and YouCam masks">
@@ -44,6 +46,20 @@ SQLite file at `data-local/skinverdict.db` (WAL mode), schema created on first s
 ## Agent
 
 `internal/agent` calls the **Claude Code CLI** headlessly (`claude -p … --output-format json`) — no API key, it uses the CLI's own login. The verdict is computed first and is final; the model only chooses among the actions the verdict allows (e.g. a high-confidence *not working* allows `refund_credit` or `swap`) and writes the shopper-facing reason. Any CLI failure or off-policy answer falls back to the deterministic `RuleAgent`, so check-ins never block. `AGENT=rules` disables the model entirely.
+
+## Deploy (Cloud Run)
+
+```bash
+# once: store the key as a secret Cloud Run can read
+gcloud secrets create skinverdict-youcam-key --data-file=-   # paste the key, then Ctrl-D
+gcloud secrets add-iam-policy-binding skinverdict-youcam-key \
+  --member=serviceAccount:<project-number>-compute@developer.gserviceaccount.com --role=roles/secretmanager.secretAccessor
+# every release (the Dockerfile bakes the demo data from deploy/cloudrun/seed)
+gcloud run deploy skinverdict --source . --region us-central1 --min-instances 0 --max-instances 1 \
+  --allow-unauthenticated --memory 512Mi --set-secrets YOUCAM_API_KEY=skinverdict-youcam-key:latest
+```
+
+The disk is ephemeral, so each cold start begins from the baked demo data; the agent runs in `rules` mode (no Claude CLI login in the container).
 
 ## Deploy (VPS)
 
