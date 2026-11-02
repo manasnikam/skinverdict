@@ -6,12 +6,7 @@ Built on the **YouCam AI Skin Analysis API** (Perfect Corp) for the YouCam API S
 
 **Live demo:** https://skinverdict-gwjm7k5b2a-uc.a.run.app (resets to the demo data on each cold start; the AI-face trial is `#/trial/c8146f44226c96c9`)
 
-<p>
-  <img src="docs/home.png" width="260" alt="Pick a product, see outcomes for people with your skin type">
-  <img src="docs/trial.png" width="260" alt="Trial verdict, agent action, score chart and YouCam masks">
-</p>
-
-![Brand dashboard: which product fails for which skin type](docs/brand.png)
+![SkinVerdict walkthrough: verdict and ₹699 guarantee credit, product picker, YouCam pore mask, Working verdict, raw vs app score, one bad scan, how we judged, brand dashboard, verdict code](docs/slideshow.gif)
 
 ## Why
 
