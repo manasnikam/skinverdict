@@ -9,3 +9,4 @@ web/dist/assets/
 .playwright-mcp/
 .DS_Store
 deploy/cloudrun/seed/
+video/
