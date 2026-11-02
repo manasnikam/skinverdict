@@ -1,0 +1,17 @@
+# Upload only what the Dockerfile needs (gcloud would otherwise fall back to .gitignore,
+# which excludes the baked demo data in deploy/cloudrun/seed).
+.git
+.env
+.env.*
+data-local/
+bin/
+web/node_modules/
+web/dist/assets/
+video/
+docs/
+samples/
+.omc/
+.playwright-mcp/
+.impeccable/
+.youcam-cache/
+.scaffold.tgz

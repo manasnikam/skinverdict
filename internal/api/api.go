@@ -38,8 +38,8 @@ func (s *Server) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /api/brand/cohorts", s.cohorts)                  // ?by=profile for product × skin-profile rows
 	mux.HandleFunc("GET /api/products/{id}/outcomes", s.productOutcomes) // ?profile=oily → "people like you"
 
-	// scan images + masks
-	mux.Handle("GET /files/", http.StripPrefix("/files/", http.FileServer(http.Dir(s.App.DataDir))))
+	// scan images + masks only: DataDir also holds the database and the YouCam cache
+	mux.Handle("GET /files/scans/", http.StripPrefix("/files/", http.FileServer(http.Dir(s.App.DataDir))))
 }
 
 // ---------- helpers ----------

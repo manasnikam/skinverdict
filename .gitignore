@@ -8,3 +8,4 @@ web/dist/assets/
 .omc/
 .playwright-mcp/
 .DS_Store
+deploy/cloudrun/seed/

@@ -307,7 +307,7 @@ function TrialPage({ id, cat }: { id: string; cat: Catalog }) {
           <div class="ba">
             {(scans.length > 1 ? [s0, sN] : [s0]).map((s) => (
               <figure>
-                <img src={s.mask_urls[target] ?? s.image_url} alt={`${Label} mask, day ${dayOf(s, s0)}`} />
+                {(s.mask_urls[target] || s.image_url) && <img src={s.mask_urls[target] || s.image_url} alt={`${Label} mask, day ${dayOf(s, s0)}`} />}
                 <b class="t-sub">{s === s0 ? "Day 0" : `Day ${dayOf(sN, s0)}`}</b>
                 <span class="t-foot">YouCam raw score</span>
                 <span class="stat">{Math.round(s.scores[target])}</span>
@@ -321,7 +321,7 @@ function TrialPage({ id, cat }: { id: string; cat: Catalog }) {
             <p class="t-head">{label(k)} got worse</p>
             <div class="ba small">
               <img src={s0.mask_urls[k]} alt={`${label(k)} mask, day 0`} />
-              <img src={sN.mask_urls[k] ?? sN.image_url} alt={`${label(k)} mask, day ${dayOf(sN, s0)}`} />
+              {(sN.mask_urls[k] || sN.image_url) && <img src={sN.mask_urls[k] || sN.image_url} alt={`${label(k)} mask, day ${dayOf(sN, s0)}`} />}
             </div>
           </>)}
           <div class="api"><b>Analysed by YouCam AI Skin Analysis · quality-gated by JS Camera Kit</b><span>Last scan: {cost(sN)}</span></div>
