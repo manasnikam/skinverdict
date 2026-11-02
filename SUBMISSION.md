@@ -96,7 +96,6 @@ go, preact, vite, sqlite, youcam-api, youcam-camera-kit, claude-code
 ## Links
 - Live demo: https://skinverdict-gwjm7k5b2a-uc.a.run.app
 - Code: https://github.com/manasnikam/skinverdict
-- Demo video: https://youtu.be/RpIzEpALbzY
 
 ## Gallery
 Images are exported from the demo video at 1500×1000 (3:2) into `video/out/gallery/` (gitignored; regenerate from `video/out/final.mp4`). Use image 1 as the cover. YouTube thumbnail: `video/out/youtube-thumbnail.jpg` (1280×720).
