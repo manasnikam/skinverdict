@@ -6,6 +6,24 @@ SkinVerdict
 ## Elevator pitch (192 characters)
 Is your skincare actually working? SkinVerdict re-scans your skin with YouCam AI, gives a fair verdict on the one thing a product claims to fix, and reorders, swaps or refunds as store credit.
 
+## Description
+SkinVerdict answers the question every skincare buyer asks in front of the mirror: is this actually working? It turns the YouCam AI Skin Analysis API into a trial that ends in a verdict, and the verdict decides what happens to the shopper's money.
+
+**How it works for the shopper**
+- **Start a trial.** Pick a product and take a baseline selfie. The YouCam JS Camera Kit won't capture until face position, angle and lighting are right, so a week-4 scan compares fairly with day 0.
+- **Check in weekly.** Each scan is scored by YouCam on the one concern the product claims to fix (pores for a niacinamide serum, breakouts for salicylic acid), plus "guard" concerns that would show a side effect. Before/after masks show where the change happened.
+- **Get a verdict.** Working, Not yet, or Not working, from published rules: a ±4-point noise band, a 28-day decision horizon, side-effect flags, and adherence (scans after skipped use don't count). With 3+ scans it counts only the change that both the first-vs-latest scores and a robust trend agree on, so one bad photo can't decide the result. It judges YouCam's raw score, not the friendlier score shoppers usually see, and shows both.
+- **The agent acts on it.** Working: the next bottle is reordered. Too early: it holds. Not working: the brand's money-back promise (the Proof Guarantee) is settled as store credit automatically, and the agent suggests an alternative product to try next. The scan is the arbitrator, not a support ticket.
+- **People like you.** Each product card shows verified outcomes for shoppers with the same skin type, e.g. "1 of 2 oily-skin shoppers: working".
+
+**Value for the shopper:** no more paying for months of a product on faith. You find out in four weeks, with evidence, and you don't lose money when it doesn't work.
+
+**Value for the retailer and brand**
+- **Renewals that stick:** reorders happen when there's evidence the product works, instead of subscriptions that churn when customers lose faith.
+- **A guarantee that's cheap to run:** refunds are decided by a measurement, not by arguing with customers, and are paid as store credit that stays in the shop.
+- **A brand dashboard** with success rate, guarantee credits paid, reorder revenue and outcomes by skin type. It shows, for example, that a serum works for oily and combination skin but fails 2 of 2 times for dry skin, so the brand can stop recommending it to dry skin before more refunds pile up.
+- **Proof for marketing claims:** "scan-verified" results replace star ratings as the trust signal on the product page.
+
 ## Inspiration
 The hackathon brief names the moment exactly: *standing in front of a mirror deciding whether a product is working*. Every brand says it works; nobody measures it. Subscriptions churn on vibes, reviews are vibes, and even YouCam's consumer-facing `ui_score` is documented as "adjusted to produce more favorable results". We built the thing that tracks the number underneath.
 
