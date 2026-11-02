@@ -16,7 +16,7 @@ export type Scan = {
 };
 export type CohortRow = {
   product_id: string; name: string; target: string; profile?: string; trials: number; judged: number;
-  by_status: Record<string, number>; mean_delta: number; worsened: Record<string, number>; credits_issued: number;
+  by_status: Record<string, number>; mean_delta: number; worsened: Record<string, number>; credits_issued: number; credits_inr: number;
 };
 export type Verdict = {
   status: "working" | "not_yet" | "not_working"; target: string; baseline: number; latest: number;

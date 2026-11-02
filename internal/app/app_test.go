@@ -149,6 +149,11 @@ func TestProofGuaranteeAndAdherence(t *testing.T) {
 	if tr2.Status != "credited" || tr2.LastAction.Kind != "refund_credit" || tr2.LastAction.CreditINR != 699 || tr2.LastAction.SwapTo == "" {
 		t.Fatalf("action %+v", tr2.LastAction)
 	}
+	// a second check-in on a closed trial must not issue another credit
+	tr4, _, err := a.CheckIn(context.Background(), tr.ID)
+	if err != nil || tr4.LastAction.OrderRef != tr2.LastAction.OrderRef {
+		t.Fatalf("re-check-in on credited trial: %v %+v", err, tr4.LastAction)
+	}
 
 	// adherence: a scan after skipped use is excluded from the judgement
 	tr3, _ := a.StartTrial(p.ID, "nia10")

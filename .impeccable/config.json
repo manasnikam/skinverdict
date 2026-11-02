@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          "web/src/style.css"
+        ],
+        "createdAt": "2026-11-02T05:44:55.776Z",
+        "reason": "Claude triage: user requested a retro CD player design; glows are limited to LCD readouts and LED indicators, which are literal light sources on that hardware"
+      },
+      {
+        "rule": "organic-clip-path",
+        "value": "*",
+        "files": [
+          "web/src/style.css"
+        ],
+        "createdAt": "2026-11-02T05:48:13.295Z",
+        "reason": "Claude triage: clip-paths draw geometric transport icons (play triangle, skip-forward, plus), not organic contours"
+      }
+    ]
+  }
+}

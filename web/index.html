@@ -4,6 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>SkinVerdict</title>
+    <meta name="theme-color" content="#F9F9F9" />
+    <script>
+      window.svTheme = function (t, save) {
+        if (!/^(light|dark|retro)$/.test(t)) t = "light";
+        document.documentElement.setAttribute("data-theme", t);
+        var m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = { light: "#F9F9F9", dark: "#161618", retro: "#2A0A0E" }[t];
+        if (t === "retro" && !document.getElementById("retro-fonts")) { var l = document.createElement("link"); l.id = "retro-fonts"; l.rel = "stylesheet"; l.href = "https://fonts.googleapis.com/css2?family=VT323&display=swap"; document.head.appendChild(l); }
+        if (save !== false) { try { localStorage.setItem("sv-theme", t); } catch (e) {} }
+      };
+      (function () { var t = null; try { t = localStorage.getItem("sv-theme"); } catch (e) {} window.svTheme(t || "light", false); })();
+    </script>
     <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>

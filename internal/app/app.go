@@ -180,6 +180,9 @@ func (a *App) CheckIn(ctx context.Context, trialID string) (*store.Trial, verdic
 	if err != nil {
 		return nil, v, err
 	}
+	if t.Status == "credited" || t.Status == "swapped" {
+		return t, v, nil // closed: re-running would issue a second credit or swap
+	}
 	p, _ := a.Catalog.Product(t.ProductID)
 	act, err := a.Agent.Decide(ctx, DecideInput{Trial: *t, Product: p, Verdict: v, Scans: scans, Catalog: a.Catalog})
 	if err != nil {

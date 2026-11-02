@@ -243,6 +243,7 @@ type cohortRow struct {
 	MeanDelta float64        `json:"mean_delta"`
 	Worsened  map[string]int `json:"worsened"`
 	Credits   int            `json:"credits_issued"`
+	CreditINR int            `json:"credits_inr"`
 }
 
 // aggregate builds product (× profile) rows from every trial's current verdict.
@@ -289,6 +290,7 @@ func (s *Server) aggregate(byProfile bool) ([]cohortRow, error) {
 		}
 		if t.LastAction != nil && t.LastAction.Kind == "refund_credit" {
 			rw.Credits++
+			rw.CreditINR += t.LastAction.CreditINR
 		}
 	}
 	out := make([]cohortRow, 0, len(rows))
