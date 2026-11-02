@@ -53,6 +53,17 @@ SkinVerdict turns the YouCam AI Skin Analysis API into a post-purchase efficacy 
 
 **The surprising one, which changed the product.** To build a demo timeline, I took one face and made five "selfies" from it, changing only the crop, a 1° tilt and the exposure. The skin itself was never touched. YouCam scored the pores 91, 97, 81, 96 and 93. That's a 16-point spread on a face that hadn't changed at all. Our verdict had compared the first scan with the latest one, so if the 81 had happened to be the last photo, we would have told someone their serum was hurting them and refunded the wrong product. We rewrote the rule: with three or more scans, SkinVerdict now counts only the change that both the endpoints and a robust trend line agree on, using a Theil–Sen median slope. That way one bad photo can't decide a refund. The surprise turned into the line we close the demo on: "One scan can't decide a refund. Five can."
 
+## Use cases nobody is talking about yet
+Most people treat skin analysis as a one-time thing: scan once, get a product recommendation. Building SkinVerdict convinced me the bigger value is in **repeat measurement**: the same person scanned the same way over weeks, with statistics that account for scan noise. Seen that way, a few industries open up:
+
+1. **Cosmetic claims substantiation.** "Visibly reduces pores in 4 weeks" usually needs a lab panel: recruit people, bring them in weekly, measure. A remote panel, where participants scan at home through a capture gate like Camera Kit and robust trend statistics are run on the results, could make claim testing faster and cheaper. That would let small D2C brands substantiate claims they currently can't afford to test.
+2. **Retail returns and guarantees.** Opened skincare usually can't be resold, so "money-back if it doesn't work" is either a pure loss or a promise brands quietly avoid. A measured outcome turns it into a policy a retailer can actually price: refund when the scans say it didn't work, renew when they say it did. That's what SkinVerdict does, and the same approach fits pharmacies and marketplaces.
+3. **Follow-up between dermatologist visits.** For treatments that take months to show results (acne regimens, pigmentation treatments), patients often quit before anything visible happens. Weekly at-home scans could show a doctor the trend before the next appointment. This would be tracking, not diagnosis, but it addresses why people abandon treatment.
+4. **Salons, spas and clinics proving their results.** A facial or peel package is sold on before/after photos that customers don't fully trust. Standardised scans with raw scores give service businesses evidence they can show a client at session six.
+5. **Checking influencer "30-day results".** Brands pay creators for transformation content they can't verify. A scan series with a quality gate and dated captures is much harder to fake than two photos.
+
+The common thread came from our own data: five photos of one unchanged face scored between 81 and 97 on pores. The API is accurate enough to be useful, but any single score is noisy. The products that win will treat YouCam as a measuring instrument and design around its error margin, rather than treating each score as a final answer.
+
 ## Accomplishments
 A complete loop — capture → analysis → verdict → agent action → brand analytics — on a stack that deploys as one 11 MB binary, with the scoring rules published in the repo.
 
