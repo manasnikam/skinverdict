@@ -6,7 +6,8 @@
 //  3. POST /s2s/v2.0/task/{feature}   -> task_id
 //  4. GET  /s2s/v2.0/task/{feature}/{task_id} until success|error
 //
-// Units are only charged on success. Results are cached on disk keyed by
+// Units are charged when the task succeeds server-side, even if we stopped
+// polling before then (seen when tasks took ~2m40s). Results are cached on disk keyed by
 // feature + body + image hash so re-running the same input costs 0 units.
 package youcam
 
