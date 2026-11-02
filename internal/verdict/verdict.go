@@ -69,14 +69,13 @@ func Evaluate(target string, scans []Scan, opt Options) (Verdict, error) {
 	days := int(math.Round(last.At.Sub(base.At).Hours() / 24))
 	v := Verdict{Target: target, Baseline: b, Latest: l, Delta: l - b, Days: days, Scans: len(ss)}
 
-	// trend across all scans (points per week)
-	v.SlopePerWk = slopePerWeek(ss, target)
-
 	// One scan can swing ~15 raw points on an unchanged face (crop/exposure
 	// alone). With 3+ scans, count only the movement that both the endpoints and
 	// a robust (Theil-Sen) trend agree on, so a single outlier can't decide.
+	// trend across all scans (points per week), robust to one bad scan
+	v.SlopePerWk = theilSen(ss, target)
 	if len(ss) >= 3 {
-		v.Delta = agreed(v.Delta, theilSen(ss, target)*last.At.Sub(base.At).Hours()/(24*7))
+		v.Delta = agreed(v.Delta, v.SlopePerWk*last.At.Sub(base.At).Hours()/(24*7))
 	}
 
 	// side effects: other concerns that got worse
@@ -167,29 +166,6 @@ func explain(v Verdict, opt Options) string {
 		}
 	}
 	return s
-}
-
-func slopePerWeek(ss []Scan, target string) float64 {
-	n := 0.0
-	var sx, sy, sxx, sxy float64
-	t0 := ss[0].At
-	for _, s := range ss {
-		y, ok := s.Scores[target]
-		if !ok {
-			continue
-		}
-		x := s.At.Sub(t0).Hours() / (24 * 7)
-		n++
-		sx += x
-		sy += y
-		sxx += x * x
-		sxy += x * y
-	}
-	den := n*sxx - sx*sx
-	if n < 2 || den == 0 {
-		return 0
-	}
-	return (n*sxy - sx*sy) / den
 }
 
 // agreed returns the smaller of two same-direction changes, or 0 if they disagree.
