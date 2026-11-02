@@ -268,7 +268,7 @@ func (c *Client) RunTask(ctx context.Context, feature string, body map[string]an
 				wait = time.Second
 			}
 		}
-		if time.Since(t0) > 3*time.Minute {
+		if time.Since(t0) > 8*time.Minute { // tasks normally finish in ~6s but have taken 2m40s under load
 			return nil, errors.New("youcam: poll timeout")
 		}
 		select {

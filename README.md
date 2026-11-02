@@ -4,6 +4,13 @@
 
 Built on the **YouCam AI Skin Analysis API** (Perfect Corp) for the YouCam API Skin AI & eCommerce VTO Hackathon.
 
+<p>
+  <img src="docs/home.png" width="260" alt="Pick a product, see outcomes for people with your skin type">
+  <img src="docs/trial.png" width="260" alt="Trial verdict, agent action, score chart and YouCam masks">
+</p>
+
+![Brand dashboard: which product fails for which skin type](docs/brand.png)
+
 ## Why
 
 Every skincare brand says it works. Nobody measures it. Subscriptions churn, reviews are vibes, and YouCam's own `ui_score` is documented as "adjusted to produce more favorable results". SkinVerdict tracks the underlying `raw_score` over time and turns it into:
@@ -78,7 +85,13 @@ See `internal/verdict/verdict_test.go` for the cases.
 go run ./cmd/ingest -trial <id> -manifest photos.csv
 ```
 
-Crop faces to ≥60% of image width first (`samples/face_crop.py`), or the API returns `error_src_face_too_small`.
+Crop faces to ≥60% of image width first, or the API returns `error_src_face_too_small`.
+
+## Demo data
+
+- **"Demo: …" shoppers** (`go run ./cmd/seed`): synthetic score histories, so the brand dashboard has cohorts to show. Their scores are generated, not scanned.
+- **"Demo: AI face"**: one face from thispersondoesnotexist.com (no real person), saved as five "selfies" that differ only in crop, tilt and exposure (`python3 samples/selfie_variants.py data-local/selfies`), dated a week apart and run through the real YouCam API. The skin is never edited, so the verdict it gets is whatever YouCam measured.
+- **Live scans** in the app are real YouCam calls (9 units each).
 
 ## YouCam APIs used
 
