@@ -1,6 +1,7 @@
 package verdict
 
 import (
+	"strings"
 	"testing"
 	"time"
 )
@@ -77,5 +78,18 @@ func TestUnorderedInput(t *testing.T) {
 	v, _ := Evaluate("pore", s, DefaultOptions())
 	if v.Baseline != 22 || v.Latest != 30 {
 		t.Fatalf("got %+v", v)
+	}
+}
+
+// Real scans of one unchanged face (only crop/exposure varied): a single dip
+// to 81 must not decide the verdict.
+func TestOutlierScanDoesNotDecide(t *testing.T) {
+	s := series("pore", [2]float64{0, 91}, [2]float64{7, 93}, [2]float64{14, 92}, [2]float64{21, 93}, [2]float64{28, 81})
+	v, _ := Evaluate("pore", s, DefaultOptions())
+	if v.Status != NotWorking || v.Delta <= -4 || v.Delta >= 4 {
+		t.Fatalf("one bad last scan swung the verdict: %+v", v)
+	}
+	if want := "trend across all scans confirms"; !strings.Contains(v.Explanation, want) {
+		t.Fatalf("explanation %q", v.Explanation)
 	}
 }

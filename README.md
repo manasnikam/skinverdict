@@ -75,6 +75,7 @@ Caddy terminates HTTPS for `DOMAIN` (Camera Kit needs a secure context) and prox
 | Early win before day 14 | ≥ 8 points |
 | Decision horizon (flat ⇒ not working) | 28 days |
 | Side-effect flag on any guard concern | drop > 6 points |
+| Change that counts (3+ scans) | only what first-vs-latest **and** the Theil–Sen trend agree on, so one outlier scan can't decide |
 
 See `internal/verdict/verdict_test.go` for the cases.
 

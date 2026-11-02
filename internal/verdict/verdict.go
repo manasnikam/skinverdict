@@ -27,11 +27,11 @@ const (
 )
 
 type Options struct {
-	NoiseBand    float64 // |Δ| below this is treated as measurement noise (raw points)
-	WorsenBand   float64 // another concern dropping by more than this is flagged
-	MinDays      int     // before this, only a very large gain counts as Working
-	HorizonDays  int     // by this point, "no movement" becomes NotWorking
-	EarlyWinMult float64 // gain needed before MinDays, as a multiple of NoiseBand
+	NoiseBand    float64                     // |Δ| below this is treated as measurement noise (raw points)
+	WorsenBand   float64                     // another concern dropping by more than this is flagged
+	MinDays      int                         // before this, only a very large gain counts as Working
+	HorizonDays  int                         // by this point, "no movement" becomes NotWorking
+	EarlyWinMult float64                     // gain needed before MinDays, as a multiple of NoiseBand
 	Label        func(concern string) string // display name in Explanation; nil shows the raw concern id
 }
 
@@ -44,7 +44,7 @@ type Verdict struct {
 	Target      string             `json:"target"`
 	Baseline    float64            `json:"baseline"`
 	Latest      float64            `json:"latest"`
-	Delta       float64            `json:"delta"`        // latest - baseline, raw points (+ = better)
+	Delta       float64            `json:"delta"`        // judged change, raw points (+ = better); see Evaluate
 	SlopePerWk  float64            `json:"slope_per_wk"` // least-squares trend across all scans
 	Days        int                `json:"days"`
 	Scans       int                `json:"scans"`
@@ -71,6 +71,13 @@ func Evaluate(target string, scans []Scan, opt Options) (Verdict, error) {
 
 	// trend across all scans (points per week)
 	v.SlopePerWk = slopePerWeek(ss, target)
+
+	// One scan can swing ~15 raw points on an unchanged face (crop/exposure
+	// alone). With 3+ scans, count only the movement that both the endpoints and
+	// a robust (Theil-Sen) trend agree on, so a single outlier can't decide.
+	if len(ss) >= 3 {
+		v.Delta = agreed(v.Delta, theilSen(ss, target)*last.At.Sub(base.At).Hours()/(24*7))
+	}
 
 	// side effects: other concerns that got worse
 	for k, bv := range base.Scores {
@@ -129,6 +136,9 @@ func explain(v Verdict, opt Options) string {
 	}
 	s := fmt.Sprintf("%s %s by %.1f raw points over %d days across %d scans (noise band ±%.0f).",
 		label(v.Target), dir, math.Abs(v.Delta), v.Days, v.Scans, opt.NoiseBand)
+	if end := round1(v.Latest - v.Baseline); end != v.Delta {
+		s += fmt.Sprintf(" First to latest scan was %+.1f; we count only what the trend across all scans confirms.", end)
+	}
 	switch v.Status {
 	case Working:
 		s += " That is outside the noise band, so the product is doing something."
@@ -180,6 +190,42 @@ func slopePerWeek(ss []Scan, target string) float64 {
 		return 0
 	}
 	return (n*sxy - sx*sy) / den
+}
+
+// agreed returns the smaller of two same-direction changes, or 0 if they disagree.
+func agreed(a, b float64) float64 {
+	if a*b <= 0 {
+		return 0
+	}
+	if math.Abs(a) < math.Abs(b) {
+		return a
+	}
+	return b
+}
+
+// theilSen is the median of all pairwise slopes (points per week): robust to
+// one bad scan, unlike least squares.
+func theilSen(ss []Scan, target string) float64 {
+	var slopes []float64
+	for i := range ss {
+		for j := i + 1; j < len(ss); j++ {
+			yi, ok1 := ss[i].Scores[target]
+			yj, ok2 := ss[j].Scores[target]
+			dx := ss[j].At.Sub(ss[i].At).Hours() / (24 * 7)
+			if ok1 && ok2 && dx > 0 {
+				slopes = append(slopes, (yj-yi)/dx)
+			}
+		}
+	}
+	if len(slopes) == 0 {
+		return 0
+	}
+	sort.Float64s(slopes)
+	n := len(slopes)
+	if n%2 == 1 {
+		return slopes[n/2]
+	}
+	return (slopes[n/2-1] + slopes[n/2]) / 2
 }
 
 func round1(f float64) float64 { return math.Round(f*10) / 10 }

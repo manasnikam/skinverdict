@@ -256,7 +256,7 @@ function TrialPage({ id, cat }: { id: string; cat: Catalog }) {
           <p class="line">{Math.abs(verdict.delta) < NOISE
             ? `${Label} barely moved (${verdict.delta > 0 ? "+" : ""}${verdict.delta.toFixed(1)}) in ${days} days: no real change`
             : `${Label} ${verdict.delta > 0 ? "improved" : "got worse"} ${Math.abs(verdict.delta).toFixed(1)} points in ${days} days`}</p>
-          <p class="sub">Skin score {verdict.baseline.toFixed(1)} → {verdict.latest.toFixed(1)} · higher = healthier</p>
+          <p class="sub">First scan {verdict.baseline.toFixed(1)} → latest {verdict.latest.toFixed(1)} · higher = healthier</p>
           <span class="chip-w">{CONF[verdict.confidence] ?? verdict.confidence}</span>
           <div class="progress" role="progressbar" aria-valuemin={0} aria-valuemax={28} aria-valuenow={Math.min(days, 28)} aria-label="Trial progress"><i style={{ width: Math.min(100, (days / 28) * 100) + "%" }} /></div>
           <p class="sub">{days >= 28 ? "Day 28 reached" : `Day ${days} of 28 · ${28 - days} days to go`}</p>
