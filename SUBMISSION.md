@@ -48,6 +48,11 @@ SkinVerdict turns the YouCam AI Skin Analysis API into a post-purchase efficacy 
 - Scan noise is real: five photos of one unchanged face, varying only crop and exposure, scored 81–97 on pores. That's why the verdict judges a robust trend instead of two endpoints.
 - A 4-week product can't be demoed in 48 hours honestly, so we built an ingestion path for dated historical selfies and a labelled "simulate check-in" button rather than faking data.
 
+## When the API surprised us
+**The frustrating one.** On the last day, YouCam's skin analysis normally finished in about 6 seconds, then suddenly took 2 minutes 40 seconds per task. Our client gave up polling after 3 minutes, but the tasks still finished on YouCam's side and charged their units. Two scans were paid for and we got no result. We raised the poll timeout to 8 minutes, and the next batch ran at normal speed. The lesson: for a paid async API, a client-side timeout doesn't cancel anything, so wait long enough to collect what you've already paid for.
+
+**The surprising one, which changed the product.** To build a demo timeline, I took one face and made five "selfies" from it, changing only the crop, a 1° tilt and the exposure. The skin itself was never touched. YouCam scored the pores 91, 97, 81, 96 and 93. That's a 16-point spread on a face that hadn't changed at all. Our verdict had compared the first scan with the latest one, so if the 81 had happened to be the last photo, we would have told someone their serum was hurting them and refunded the wrong product. We rewrote the rule: with three or more scans, SkinVerdict now counts only the change that both the endpoints and a robust trend line agree on, using a Theil–Sen median slope. That way one bad photo can't decide a refund. The surprise turned into the line we close the demo on: "One scan can't decide a refund. Five can."
+
 ## Accomplishments
 A complete loop — capture → analysis → verdict → agent action → brand analytics — on a stack that deploys as one 11 MB binary, with the scoring rules published in the repo.
 
